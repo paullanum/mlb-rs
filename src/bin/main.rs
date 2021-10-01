@@ -33,7 +33,7 @@ async fn get_game(team: mlb::teams::Team) -> Option<LiveGame> {
             .first()?
             .games
             .first()?
-            .goto_link::<LiveGame>()
+            .goto_link()
             .await
             .ok()
     } else {

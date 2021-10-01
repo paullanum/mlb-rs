@@ -3,7 +3,7 @@ use std::ops::Deref;
 use anyhow::Result;
 use serde::{Deserialize, Serialize};
 
-use crate::requests::{get, GetLink};
+use crate::requests::get;
 
 #[derive(Serialize, Deserialize)]
 pub struct Teams {
@@ -21,9 +21,6 @@ pub struct Team {
 
     #[serde(rename = "name")]
     pub name: String,
-
-    #[serde(rename = "link")]
-    pub link: String,
 
     #[serde(rename = "league")]
     pub league: League,
@@ -56,12 +53,6 @@ pub struct League {
 impl Teams {
     pub async fn get_teams() -> Result<Teams> {
         get("teams").await
-    }
-}
-
-impl GetLink for Team {
-    fn get_link(&self) -> &str {
-        &self.link
     }
 }
 

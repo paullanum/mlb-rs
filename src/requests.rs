@@ -39,9 +39,9 @@ where
 }
 
 #[async_trait]
-pub trait GetLink {
+pub trait GetLink<T> {
     fn get_link(&self) -> &str;
-    async fn goto_link<T>(&self) -> Result<T>
+    async fn goto_link(&self) -> Result<T>
     where
         T: DeserializeOwned,
     {
