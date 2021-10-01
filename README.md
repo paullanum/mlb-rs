@@ -4,11 +4,16 @@
 
 ----
 
-> :warning: **Warning:** This project is still in very early development; it is not representative of what a final interface may look like, and may not even work. Use this project at your own risk, and certainly don't depend on it.
+> :warning: **Warning:** This project is still in very early development; it is not representative of what a final interface may look like, and may not even work.
+> Use this project at your own risk, and certainly don't depend on it.
 
 ----
 
-> :exclamation: **Note:** Neither this project nor I am associated with MLB in any way. This project queries the MLB API, whose usage agreement is available [here](http://gdx.mlb.com/components/copyright.txt). Though this project contains a library to query the API, it does not imply any license of ways in which said API or its data may be used.
+> :balance_scale: **Licence Info:** Neither this project nor I am associated with MLB in any way.
+> Only the code contained within the project is available under the license specified in the `LICENSE` file.
+> This project queries the MLB API, whose usage agreement is available [here](http://gdx.mlb.com/components/copyright.txt).
+> Though this project contains a library to query the API, it does not imply any license of ways in which said API or its data may be used.
+> All data retrieved is subject to MLB copyright and must follow their usage agreement
 
 ## State of the Project
 
