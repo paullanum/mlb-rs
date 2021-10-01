@@ -155,7 +155,7 @@ pub async fn get_schedule<T: std::string::ToString>(team_id: T) -> Result<Schedu
     .await
 }
 
-impl GetLink for Game {
+impl GetLink<crate::live::LiveGame> for Game {
     fn get_link(&self) -> &str {
         &self.link
     }
