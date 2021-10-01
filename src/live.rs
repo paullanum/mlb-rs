@@ -11,11 +11,20 @@ pub struct LiveGame {
     #[serde(rename = "link")]
     link: String,
 
+    #[serde(rename = "metaData")]
+    metadata: Metadata,
+
     #[serde(rename = "gameData")]
     game_data: GameData,
 
     #[serde(rename = "liveData")]
     live_data: LiveData,
+}
+
+#[derive(Deserialize, Clone)]
+struct Metadata {
+    #[serde(rename = "gameEvents")]
+    game_events: Vec<String>,
 }
 
 #[derive(Deserialize, Clone)]
@@ -88,7 +97,7 @@ struct Linescore {
     teams: LinescoreTeams,
 }
 
-#[derive(Deserialize, Clone)]
+#[derive(Deserialize, Clone, Copy)]
 struct TeamLinescore {
     #[serde(rename = "runs")]
     runs: i64,
@@ -98,12 +107,9 @@ struct TeamLinescore {
 
     #[serde(rename = "errors")]
     errors: i64,
-
-    #[serde(rename = "leftOnBase")]
-    left_on_base: i64,
 }
 
-#[derive(Deserialize, Clone)]
+#[derive(Deserialize, Clone, Copy)]
 #[serde(untagged)]
 enum OrEmpty<T> {
     Full(T),
@@ -174,8 +180,11 @@ impl TeamLinescore {
 
 impl Linescore {
     fn make_boxscore(&self, away_name: &str, home_name: &str) -> Option<BoxScore> {
-        match (self.teams.away.clone(), self.teams.home.clone()) {
-            (OrEmpty::Full(away), OrEmpty::Full(home)) => Some(BoxScore {
+        match self.teams {
+            LinescoreTeams {
+                away: OrEmpty::Full(away),
+                home: OrEmpty::Full(home),
+            } => Some(BoxScore {
                 away: away.make_boxscore(away_name),
                 home: home.make_boxscore(home_name),
                 inning_state: self.inning_state.clone()?,
@@ -208,6 +217,38 @@ impl LiveGame {
             teams: &self.game_data.teams,
             start_time: self.game_data.date_time.date_time,
         })
+    }
+    pub fn short_score(&self) -> Option<String> {
+        let inning = if self
+            .metadata
+            .game_events
+            .contains(&"game_finished".to_owned())
+        {
+            String::from("Final")
+        } else {
+            let inning_state = self.live_data.linescore.inning_state.clone().unwrap();
+            let inning_format = match inning_state.as_ref() {
+                "Top" => "▲",
+                "Bot" => "▼",
+                inn => inn,
+            };
+            format!(
+                "{}{}",
+                inning_format,
+                self.live_data.linescore.current_inning.unwrap_or_default()
+            )
+        };
+        let teams = &self.game_data.teams;
+        match self.live_data.linescore.teams {
+            LinescoreTeams {
+                home: OrEmpty::Full(home),
+                away: OrEmpty::Full(away),
+            } => Some(format!(
+                "{} {} - {} {} | {}",
+                teams.away.abbreviation, away.runs, home.runs, teams.home.abbreviation, inning
+            )),
+            _ => None,
+        }
     }
 }
 
