@@ -41,7 +41,7 @@ async fn get_game(team: mlb::teams::Team) -> Option<LiveGame> {
     }
 }
 
-async fn scores(team_name: Option<&str>) -> Result<()> {
+async fn scores(team_name: Option<&str>, short: bool) -> Result<()> {
     let teams: mlb::teams::Teams = from_str(TEAMS)?;
     let filter: Box<dyn Fn(&mlb::teams::Team) -> bool> = match team_name {
         Some(_) => Box::new(|team| {
@@ -59,12 +59,16 @@ async fn scores(team_name: Option<&str>) -> Result<()> {
     while let Some(g) = all_scores.next().await {
         if let Some(game) = g.await {
             if let Some(score) = game.get_score() {
-                println!(
-                    "{}{} {}",
-                    Table::new([score.away, score.home]).with(Style::pseudo()),
-                    score.inning_state,
-                    score.inning
-                );
+                if short {
+                    println!("{}", game.short_score().unwrap())
+                } else {
+                    println!(
+                        "{}{} {}",
+                        Table::new([score.away, score.home]).with(Style::pseudo()),
+                        score.inning_state,
+                        score.inning
+                    );
+                }
             } else {
                 println!(
                     "{}",
@@ -121,13 +125,23 @@ async fn main() -> Result<()> {
                         .short("t")
                         .takes_value(true)
                         .help("Specify a team to search for"),
+                )
+                .arg(
+                    Arg::with_name("short")
+                        .short("s")
+                        .takes_value(false)
+                        .help("Display a one-line score"),
                 ),
         )
         .subcommand(App::new("teams").about("Display available teams"));
     let matches = app.get_matches();
     match matches.subcommand() {
-        ("scores", Some(name)) => {
-            scores(name.value_of("team").or_else(|| settings.team.as_deref())).await?
+        ("scores", Some(params)) => {
+            scores(
+                params.value_of("team").or_else(|| settings.team.as_deref()),
+                params.is_present("short"),
+            )
+            .await?
         }
         ("teams", _) => teams().await?,
         ("config", Some(_)) => todo!("Add config function"),
