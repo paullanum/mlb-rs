@@ -50,7 +50,7 @@ async fn scores(team_name: Option<&str>) -> Result<()> {
             if let Some(score) = game.get_score() {
                 println!(
                     "{}{} {}",
-                    Table::new([score.away, score.home]).with(Style::pseudo()),
+                    Table::new([score.away, score.home]).with(Style::modern()),
                     score.inning_state,
                     score.inning
                 );
