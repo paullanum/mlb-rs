@@ -3,7 +3,7 @@ use std::env;
 use anyhow::Result;
 use clap::{App, Arg};
 use config::{Config, ConfigError, File};
-use mlb::{live::LiveGame, requests::GetLink};
+use mlb::live::LiveGame;
 use serde::Deserialize;
 use serde_json::from_str;
 use tabled::{Style, Table};
@@ -27,18 +27,7 @@ fn is_in_league(team: &mlb::teams::Team) -> bool {
 // TODO: Make this return a vector of games to properly handle doubleheaders.
 async fn get_game(team: mlb::teams::Team) -> Option<LiveGame> {
     let schedule = mlb::schedule::get_schedule(team.id).await.ok()?;
-    if !schedule.dates.is_empty() {
-        schedule
-            .dates
-            .first()?
-            .games
-            .first()?
-            .goto_link()
-            .await
-            .ok()
-    } else {
-        None
-    }
+    schedule.dates.first()?.games.first()?.get_game().await.ok()
 }
 
 async fn scores(team_name: Option<&str>) -> Result<()> {
@@ -47,7 +36,7 @@ async fn scores(team_name: Option<&str>) -> Result<()> {
         Some(_) => Box::new(|team| {
             team.team_name.to_lowercase().contains(team_name.unwrap()) && is_in_league(team)
         }),
-        None => Box::new(|team| is_in_league(team)),
+        None => Box::new(is_in_league),
     };
     let mut all_scores = tokio_stream::iter(teams.teams).filter_map(|team| {
         if filter(&team) {
@@ -127,7 +116,7 @@ async fn main() -> Result<()> {
     let matches = app.get_matches();
     match matches.subcommand() {
         ("scores", Some(name)) => {
-            scores(name.value_of("team").or_else(|| settings.team.as_deref())).await?
+            scores(name.value_of("team").or(settings.team.as_deref())).await?
         }
         ("teams", _) => teams().await?,
         ("config", Some(_)) => todo!("Add config function"),

@@ -1,6 +1,3 @@
-use async_trait::async_trait;
-use std::borrow::Borrow;
-
 use anyhow::Result;
 use reqwest::Url;
 use serde::de::DeserializeOwned;
@@ -8,44 +5,50 @@ use serde::de::DeserializeOwned;
 const BASE_URL: &str = "https://statsapi.mlb.com";
 const DEFAULT_API: &str = "api/v1/";
 
-pub async fn get<T>(address: &str) -> Result<T>
-where
-    T: DeserializeOwned,
-{
-    _get(create_url(address)?).await
+pub struct Request<'a> {
+    base_url: &'a str,
+    api: &'a str,
+    endpoint: &'a str,
+    params: Vec<(&'a str, &'a str)>,
 }
 
-fn create_url(param: &str) -> Result<Url> {
-    Ok(Url::parse(&format!(
-        "{}/{}{}",
-        BASE_URL, DEFAULT_API, param
-    ))?)
+impl<'a> Request<'a> {
+    pub fn new() -> Self {
+        Self {
+            base_url: BASE_URL,
+            api: DEFAULT_API,
+            endpoint: Default::default(),
+            params: Default::default(),
+        }
+    }
+
+    pub fn with_endpoint(self, endpoint: &'a str) -> Self {
+        Self { endpoint, ..self }
+    }
+
+    pub fn with_params<I: IntoIterator<Item = (&'a str, &'a str)>>(self, params: I) -> Self {
+        Self {
+            params: params.into_iter().collect(),
+            ..self
+        }
+    }
+
+    pub fn with_api(self, api: &'a str) -> Self {
+        Self { api, ..self }
+    }
+
+    pub async fn get<T: DeserializeOwned>(self) -> Result<T> {
+        let base = format!("{}/{}{}", self.base_url, self.api, self.endpoint);
+        let address = match self.params.len() {
+            0 => Url::parse(&base)?,
+            _ => Url::parse_with_params(&base, self.params)?,
+        };
+        Ok(reqwest::get(address).await?.json().await?)
+    }
 }
 
-async fn _get<T>(address: Url) -> Result<T>
-where
-    T: DeserializeOwned,
-{
-    Ok(reqwest::get(address).await?.json().await?)
-}
-
-pub async fn get_with_params<'a, T, I>(root: &str, params: I) -> Result<T>
-where
-    T: DeserializeOwned,
-    I: IntoIterator,
-    I::Item: Borrow<(&'a str, &'a str)>,
-{
-    _get(Url::parse_with_params(create_url(root)?.as_str(), params)?).await
-}
-
-#[async_trait]
-pub trait GetLink<T> {
-    fn get_link(&self) -> &str;
-    async fn goto_link(&self) -> Result<T>
-    where
-        T: DeserializeOwned,
-    {
-        log::debug!("{}{}", BASE_URL, self.get_link());
-        _get(Url::parse(&format!("{}{}", BASE_URL, self.get_link()))?).await
+impl<'a> Default for Request<'a> {
+    fn default() -> Self {
+        Self::new()
     }
 }
