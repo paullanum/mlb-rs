@@ -128,16 +128,16 @@ pub struct BoxScore {
 
 #[derive(Tabled)]
 pub struct TeamBoxScore {
-    #[header("Team")]
+    #[tabled(rename = "Team")]
     team: String,
 
-    #[header("R")]
+    #[tabled(rename = "R")]
     runs: i64,
 
-    #[header("H")]
+    #[tabled(rename = "H")]
     hits: i64,
 
-    #[header("E")]
+    #[tabled(rename = "E")]
     errors: i64,
 }
 
