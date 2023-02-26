@@ -1,7 +1,7 @@
 use std::env;
 
 use anyhow::Result;
-use clap::{App, Arg};
+use clap::{Args, Parser, Subcommand};
 use config::{Config, ConfigError, File};
 use mlb::live::LiveGame;
 use serde::Deserialize;
@@ -97,30 +97,40 @@ impl Configuration {
     }
 }
 
+#[derive(Parser)]
+struct Cli {
+    #[command(subcommand)]
+    command: Command,
+
+    #[command(flatten)]
+    delegate: Opts,
+}
+
+#[derive(Args)]
+struct Opts {
+    /// Specify a team to search for
+    #[arg(short, long)]
+    team: Option<String>,
+}
+
+#[derive(Subcommand)]
+enum Command {
+    /// Display scores for live games
+    Scores(Opts),
+    /// Display available teams
+    Teams,
+    Config,
+}
+
 #[tokio::main]
 async fn main() -> Result<()> {
     pretty_env_logger::init();
     let settings = Configuration::new()?;
-    let app = App::new("mlb")
-        .subcommand(
-            App::new("scores")
-                .about("Display scores for live games")
-                .arg(
-                    Arg::with_name("team")
-                        .short("t")
-                        .takes_value(true)
-                        .help("Specify a team to search for"),
-                ),
-        )
-        .subcommand(App::new("teams").about("Display available teams"));
-    let matches = app.get_matches();
-    match matches.subcommand() {
-        ("scores", Some(name)) => {
-            scores(name.value_of("team").or(settings.team.as_deref())).await?
-        }
-        ("teams", _) => teams().await?,
-        ("config", Some(_)) => todo!("Add config function"),
-        _ => log::error!("Error!"),
-    }
+    let app = Cli::parse();
+    match app.command {
+        Command::Scores(opts) => scores(opts.team.or(settings.team).as_deref()).await?,
+        Command::Teams => teams().await?,
+        Command::Config => todo!("Add config function"),
+    };
     Ok(())
 }
