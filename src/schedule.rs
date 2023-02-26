@@ -157,10 +157,10 @@ pub async fn get_schedule<T: std::string::ToString>(team_id: T) -> Result<Schedu
 
 impl Game {
     pub async fn get_game(&self) -> Result<LiveGame> {
-        Ok(Request::new()
+        Request::new()
             .with_api("")
             .with_endpoint(self.link.as_str())
             .get()
-            .await?)
+            .await
     }
 }

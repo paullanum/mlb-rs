@@ -52,7 +52,7 @@ pub struct League {
 
 impl Teams {
     pub async fn get_teams() -> Result<Teams> {
-        Ok(Request::new().with_endpoint("teams").get().await?)
+        Request::new().with_endpoint("teams").get().await
     }
 }
 
