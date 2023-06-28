@@ -27,7 +27,15 @@ fn is_in_league(team: &mlb::teams::Team) -> bool {
 // TODO: Make this return a vector of games to properly handle doubleheaders.
 async fn get_game(team: mlb::teams::Team) -> Option<LiveGame> {
     let schedule = mlb::schedule::get_schedule(team.id).await.ok()?;
-    schedule.dates.first()?.games.first()?.get_game().await.ok()
+    schedule
+        .dates
+        .first()?
+        .games
+        .first()?
+        .link
+        .follow()
+        .await
+        .ok()
 }
 
 async fn scores(team_name: Option<&str>) -> Result<()> {
