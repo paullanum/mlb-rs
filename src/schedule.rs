@@ -1,7 +1,7 @@
 use anyhow::Result;
 use serde::{Deserialize, Serialize};
 
-use crate::{live::LiveGame, requests::Request};
+use crate::{link::Link, live::LiveGame, requests::Request};
 
 #[derive(Serialize, Deserialize)]
 pub struct Schedule {
@@ -57,7 +57,7 @@ pub struct Game {
     pub game_pk: i64,
 
     #[serde(rename = "link")]
-    pub link: String,
+    pub link: Link<LiveGame>,
 
     #[serde(rename = "teams")]
     pub teams: Teams,
@@ -70,12 +70,6 @@ pub struct Game {
 
     #[serde(rename = "scheduledInnings")]
     pub scheduled_innings: i64,
-}
-
-#[derive(Serialize, Deserialize, Clone)]
-pub struct Content {
-    #[serde(rename = "link")]
-    pub link: String,
 }
 
 #[derive(Serialize, Deserialize, Clone)]
@@ -142,9 +136,6 @@ pub struct Venue {
 
     #[serde(rename = "name")]
     pub name: String,
-
-    #[serde(rename = "link")]
-    pub link: String,
 }
 
 pub async fn get_schedule<T: std::string::ToString>(team_id: T) -> Result<Schedule> {
@@ -153,14 +144,4 @@ pub async fn get_schedule<T: std::string::ToString>(team_id: T) -> Result<Schedu
         .with_params([("sportId", "1"), ("teamId", &team_id.to_string())])
         .get()
         .await
-}
-
-impl Game {
-    pub async fn get_game(&self) -> Result<LiveGame> {
-        Request::new()
-            .with_api("")
-            .with_endpoint(self.link.as_str())
-            .get()
-            .await
-    }
 }
