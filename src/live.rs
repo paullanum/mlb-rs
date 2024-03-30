@@ -1,7 +1,7 @@
 extern crate serde_json;
 use chrono::{DateTime, Local, Utc};
 use serde::Deserialize;
-use tabled::{Style, Table, Tabled};
+use tabled::{settings::Style, Table, Tabled};
 
 #[derive(Deserialize, Clone, Debug)]
 pub struct LiveGame {

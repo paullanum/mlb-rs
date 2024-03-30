@@ -81,17 +81,16 @@ struct Configuration {
 
 impl Configuration {
     pub fn new() -> Result<Self, ConfigError> {
-        let mut s = Config::default();
+        let mut s = Config::builder();
         if let Ok(name) = env::var("MLB_CONFIG") {
-            s.merge(File::with_name(&name))?;
+            s = s.add_source(File::with_name(&name));
         } else {
             let file_path = dirs::home_dir()
                 .unwrap_or_else(|| std::path::PathBuf::from(""))
                 .join("mlb_settings");
-            s.merge(File::with_name(file_path.to_str().unwrap_or("")).required(false))?;
+            s = s.add_source(File::with_name(file_path.to_str().unwrap_or("")).required(false));
         }
-
-        s.try_into()
+        s.build()?.try_deserialize()
     }
 }
 
