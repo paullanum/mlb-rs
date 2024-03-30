@@ -6,7 +6,6 @@ use config::{Config, ConfigError, File};
 use mlb::live::LiveGame;
 use serde::Deserialize;
 use serde_json::from_str;
-use tabled::{Style, Table};
 use tokio_stream::StreamExt;
 
 const AVAILABLE_LEAGUES: &[&str] = &["american league", "national league"];
@@ -52,12 +51,7 @@ async fn scores(team_name: Option<&str>) -> Result<()> {
     while let Some(g) = all_scores.next().await {
         if let Some(game) = g.await {
             if let Some(score) = game.get_score() {
-                println!(
-                    "{}{} {}",
-                    Table::new([score.away, score.home]).with(Style::modern()),
-                    score.inning_state,
-                    score.inning
-                );
+                println!("{score}");
             } else {
                 println!(
                     "{}",

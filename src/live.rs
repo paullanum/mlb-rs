@@ -1,16 +1,10 @@
 extern crate serde_json;
 use chrono::{DateTime, Local, Utc};
 use serde::Deserialize;
-use tabled::Tabled;
+use tabled::{Style, Table, Tabled};
 
 #[derive(Deserialize, Clone, Debug)]
 pub struct LiveGame {
-    #[serde(rename = "gamePk")]
-    game_pk: i64,
-
-    #[serde(rename = "link")]
-    link: String,
-
     #[serde(rename = "gameData")]
     game_data: GameData,
 
@@ -121,10 +115,10 @@ struct LinescoreTeams {
 
 #[derive(Debug)]
 pub struct BoxScore {
-    pub away: TeamBoxScore,
-    pub home: TeamBoxScore,
-    pub inning_state: String,
-    pub inning: i64,
+    away: TeamBoxScore,
+    home: TeamBoxScore,
+    inning_state: String,
+    inning: i64,
 }
 
 #[derive(Tabled, Debug)]
@@ -176,7 +170,7 @@ impl TeamLinescore {
 
 impl Linescore {
     fn make_boxscore(&self, away_name: &str, home_name: &str) -> Option<BoxScore> {
-        match (self.teams.away.clone(), self.teams.home.clone()) {
+        match (&self.teams.away, &self.teams.home) {
             (OrEmpty::Full(away), OrEmpty::Full(home)) => Some(BoxScore {
                 away: away.make_boxscore(away_name),
                 home: home.make_boxscore(home_name),
@@ -185,6 +179,18 @@ impl Linescore {
             }),
             _ => None,
         }
+    }
+}
+
+impl std::fmt::Display for BoxScore {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(
+            f,
+            "{}{} {}",
+            Table::new([&self.away, &self.home]).with(Style::modern()),
+            self.inning_state,
+            self.inning
+        )
     }
 }
 
