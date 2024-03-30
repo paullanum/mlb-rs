@@ -5,6 +5,7 @@ use serde::de::DeserializeOwned;
 const BASE_URL: &str = "https://statsapi.mlb.com";
 const DEFAULT_API: &str = "api/v1/";
 
+#[derive(Debug)]
 pub struct Request<'a> {
     base_url: &'a str,
     api: &'a str,

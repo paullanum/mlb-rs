@@ -40,14 +40,10 @@ async fn get_game(team: mlb::teams::Team) -> Option<LiveGame> {
 
 async fn scores(team_name: Option<&str>) -> Result<()> {
     let teams: mlb::teams::Teams = from_str(TEAMS)?;
-    let filter: Box<dyn Fn(&mlb::teams::Team) -> bool> = match team_name {
-        Some(_) => Box::new(|team| {
-            team.team_name.to_lowercase().contains(team_name.unwrap()) && is_in_league(team)
-        }),
-        None => Box::new(is_in_league),
-    };
     let mut all_scores = tokio_stream::iter(teams.teams).filter_map(|team| {
-        if filter(&team) {
+        if team_name.is_some_and(|name| team.team_name.to_lowercase().contains(name))
+            && is_in_league(&team)
+        {
             Some(get_game(team))
         } else {
             None

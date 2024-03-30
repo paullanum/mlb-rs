@@ -3,7 +3,7 @@ use serde::{Deserialize, Serialize};
 
 use crate::{link::Link, live::LiveGame, requests::Request};
 
-#[derive(Serialize, Deserialize)]
+#[derive(Serialize, Deserialize, Debug)]
 pub struct Schedule {
     #[serde(rename = "copyright")]
     pub copyright: String,
@@ -24,7 +24,7 @@ pub struct Schedule {
     pub dates: Vec<Date>,
 }
 
-#[derive(Serialize, Deserialize)]
+#[derive(Serialize, Deserialize, Debug)]
 pub struct Date {
     #[serde(rename = "date")]
     pub date: String,
@@ -48,10 +48,10 @@ pub struct Date {
     pub events: Vec<Option<Event>>,
 }
 
-#[derive(Serialize, Deserialize)]
+#[derive(Serialize, Deserialize, Debug)]
 pub struct Event {}
 
-#[derive(Serialize, Deserialize, Clone)]
+#[derive(Serialize, Deserialize, Clone, Debug)]
 pub struct Game {
     #[serde(rename = "gamePk")]
     pub game_pk: i64,
@@ -72,7 +72,7 @@ pub struct Game {
     pub scheduled_innings: i64,
 }
 
-#[derive(Serialize, Deserialize, Clone)]
+#[derive(Serialize, Deserialize, Clone, Debug)]
 pub struct Status {
     #[serde(rename = "abstractGameState")]
     pub abstract_game_state: String,
@@ -93,7 +93,7 @@ pub struct Status {
     pub abstract_game_code: String,
 }
 
-#[derive(Serialize, Deserialize, Clone)]
+#[derive(Serialize, Deserialize, Clone, Debug)]
 pub struct Teams {
     #[serde(rename = "away")]
     pub away: Team,
@@ -102,7 +102,7 @@ pub struct Teams {
     pub home: Team,
 }
 
-#[derive(Serialize, Deserialize, Clone)]
+#[derive(Serialize, Deserialize, Clone, Debug)]
 pub struct Team {
     #[serde(rename = "leagueRecord")]
     pub league_record: LeagueRecord,
@@ -117,7 +117,7 @@ pub struct Team {
     pub series_number: i64,
 }
 
-#[derive(Serialize, Deserialize, Clone)]
+#[derive(Serialize, Deserialize, Clone, Debug)]
 pub struct LeagueRecord {
     #[serde(rename = "wins")]
     pub wins: i64,
@@ -129,7 +129,7 @@ pub struct LeagueRecord {
     pub pct: String,
 }
 
-#[derive(Serialize, Deserialize, Clone)]
+#[derive(Serialize, Deserialize, Clone, Debug)]
 pub struct Venue {
     #[serde(rename = "id")]
     pub id: i64,

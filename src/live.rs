@@ -3,7 +3,7 @@ use chrono::{DateTime, Local, Utc};
 use serde::Deserialize;
 use tabled::Tabled;
 
-#[derive(Deserialize, Clone)]
+#[derive(Deserialize, Clone, Debug)]
 pub struct LiveGame {
     #[serde(rename = "gamePk")]
     game_pk: i64,
@@ -18,7 +18,7 @@ pub struct LiveGame {
     live_data: LiveData,
 }
 
-#[derive(Deserialize, Clone)]
+#[derive(Deserialize, Clone, Debug)]
 struct GameData {
     #[serde(rename = "teams")]
     teams: GameDataTeams,
@@ -27,13 +27,13 @@ struct GameData {
     date_time: GameDateTime,
 }
 
-#[derive(Deserialize, Clone)]
+#[derive(Deserialize, Clone, Debug)]
 struct GameDateTime {
     #[serde(rename = "dateTime", with = "date_format")]
     date_time: DateTime<Utc>,
 }
 
-#[derive(Deserialize, Clone)]
+#[derive(Deserialize, Clone, Debug)]
 struct GameDataTeams {
     #[serde(rename = "away")]
     away: GameDataTeam,
@@ -42,7 +42,7 @@ struct GameDataTeams {
     home: GameDataTeam,
 }
 
-#[derive(Deserialize, Clone)]
+#[derive(Deserialize, Clone, Debug)]
 struct GameDataTeam {
     #[serde(rename = "id")]
     id: i64,
@@ -60,7 +60,7 @@ struct GameDataTeam {
     record: Record,
 }
 
-#[derive(Deserialize, Clone)]
+#[derive(Deserialize, Clone, Debug)]
 struct Record {
     #[serde(rename = "wins")]
     wins: i64,
@@ -69,14 +69,14 @@ struct Record {
     losses: i64,
 }
 
-#[derive(Deserialize, Clone)]
+#[derive(Deserialize, Clone, Debug)]
 struct LiveData {
     #[serde(rename = "linescore")]
     linescore: Linescore,
 }
 
 // TODO: Add in other details here
-#[derive(Deserialize, Clone)]
+#[derive(Deserialize, Clone, Debug)]
 struct Linescore {
     #[serde(rename = "currentInning")]
     current_inning: Option<i64>,
@@ -88,7 +88,7 @@ struct Linescore {
     teams: LinescoreTeams,
 }
 
-#[derive(Deserialize, Clone)]
+#[derive(Deserialize, Clone, Debug)]
 struct TeamLinescore {
     #[serde(rename = "runs")]
     runs: i64,
@@ -103,14 +103,14 @@ struct TeamLinescore {
     left_on_base: i64,
 }
 
-#[derive(Deserialize, Clone)]
+#[derive(Deserialize, Clone, Debug)]
 #[serde(untagged)]
 enum OrEmpty<T> {
     Full(T),
     Empty {},
 }
 
-#[derive(Deserialize, Clone)]
+#[derive(Deserialize, Clone, Debug)]
 struct LinescoreTeams {
     #[serde(rename = "home")]
     home: OrEmpty<TeamLinescore>,
@@ -119,6 +119,7 @@ struct LinescoreTeams {
     away: OrEmpty<TeamLinescore>,
 }
 
+#[derive(Debug)]
 pub struct BoxScore {
     pub away: TeamBoxScore,
     pub home: TeamBoxScore,
@@ -126,7 +127,7 @@ pub struct BoxScore {
     pub inning: i64,
 }
 
-#[derive(Tabled)]
+#[derive(Tabled, Debug)]
 pub struct TeamBoxScore {
     #[tabled(rename = "Team")]
     team: String,
@@ -141,6 +142,7 @@ pub struct TeamBoxScore {
     errors: i64,
 }
 
+#[derive(Debug)]
 pub struct GameStart<'a> {
     teams: &'a GameDataTeams,
     start_time: DateTime<Utc>,

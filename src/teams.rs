@@ -5,7 +5,7 @@ use serde::{Deserialize, Serialize};
 
 use crate::requests::Request;
 
-#[derive(Serialize, Deserialize)]
+#[derive(Serialize, Deserialize, Debug)]
 pub struct Teams {
     #[serde(rename = "copyright")]
     copyright: String,
@@ -14,7 +14,7 @@ pub struct Teams {
     pub teams: Vec<Team>,
 }
 
-#[derive(Serialize, Deserialize, Clone)]
+#[derive(Serialize, Deserialize, Clone, Debug)]
 pub struct Team {
     #[serde(rename = "id")]
     pub id: i64,
@@ -35,7 +35,7 @@ pub struct Team {
     pub abbreviation: Option<String>,
 }
 
-#[derive(Serialize, Deserialize, Clone)]
+#[derive(Serialize, Deserialize, Clone, Debug)]
 pub struct League {
     #[serde(rename = "id")]
     pub id: Option<i64>,

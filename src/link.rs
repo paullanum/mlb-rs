@@ -4,10 +4,22 @@ use crate::requests::Request;
 use anyhow::Result;
 use serde::{Deserialize, Serialize};
 
-#[derive(Serialize, Deserialize, Clone)]
-pub struct Link<T: for<'d> Deserialize<'d>> {
+#[derive(Serialize, Clone, Debug)]
+pub struct Link<T> {
     _phantom: PhantomData<T>,
     link: String,
+}
+
+impl<'de, T> Deserialize<'de> for Link<T> {
+    fn deserialize<D>(deserializer: D) -> core::result::Result<Self, D::Error>
+    where
+        D: serde::Deserializer<'de> {
+        let value = Deserialize::deserialize(deserializer)?;
+        Ok(Self {
+            _phantom: PhantomData,
+            link: value,
+        })
+    }
 }
 
 impl<T: for<'de> Deserialize<'de>> Link<T> {
