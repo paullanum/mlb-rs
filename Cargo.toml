@@ -1,28 +1,28 @@
 [package]
 name = "mlb"
 version = "0.1.0"
-edition = "2018"
+edition = "2024"
 resolver = "2"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
 anyhow = "1.0.81"
-clap = { version="4.5.4", features = ["derive"]}
-reqwest = {version = "0.12.2", features = ["json", "blocking"]}
-serde = {version = "1.0.197", features = ["derive"]}
+clap = { version = "4.5.4", features = ["derive"] }
+reqwest = { version = "0.12.2", features = ["json", "blocking"] }
+serde = { version = "1.0.197", features = ["derive"] }
 serde_json = "1.0.115"
-tabled = "0.15.0"
-tokio = {version = "1.37.0", features = ["rt-multi-thread", "macros"]}
-chrono = {version = "0.4.37", features = ["serde"]}
+tabled = "0.19.0"
+tokio = { version = "1.37.0", features = ["rt-multi-thread", "macros"] }
+chrono = { version = "0.4.37", features = ["serde"] }
 log = "0.4.21"
 pretty_env_logger = "0.5.0"
-config = "0.14.0"
-dirs = "5.0.1"
+config = "0.15.11"
+dirs = "6.0.0"
 tokio-stream = "0.1.15"
 
 [build-dependencies]
-http_req = "0.10.2"
+http_req = "0.13.3"
 
 [lib]
 name = "mlb"
